@@ -1,0 +1,24 @@
+{
+  "name": "oac-effect",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "aoc": "./index.ts"
+  },
+  "dependencies": {
+    "effect": "^3.11.0",
+    "@effect/platform": "^0.70.0",
+    "@effect/platform-node": "^0.65.0",
+    "@effect/cli": "^0.49.0",
+    "@effect/parser": "link:../effect-ts-parser",
+    "cheerio": "^1.0.0",
+    "tsx": "^4.19.2",
+    "aoc2024": "file:."
+  },
+  "devDependencies": {
+    "@effect/vitest": "^0.14.1",
+    "@types/node": "^20.0.0",
+    "vite": "^5.4.0",
+    "vitest": "^2.1.4"
+  }
+}
