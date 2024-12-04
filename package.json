@@ -6,11 +6,11 @@
     "aoc": "./index.ts"
   },
   "dependencies": {
-    "effect": "^3.11.0",
+    "effect": "^3.11.2",
     "@effect/platform": "^0.70.0",
     "@effect/platform-node": "^0.65.0",
     "@effect/cli": "^0.49.0",
-    "@effect/parser": "link:../effect-ts-parser",
+    "@effect/parser": "file:../effect-ts-parser/dist",
     "cheerio": "^1.0.0",
     "tsx": "^4.19.2",
     "aoc2024": "file:."

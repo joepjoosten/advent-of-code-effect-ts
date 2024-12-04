@@ -5,7 +5,7 @@ import { isValidationError } from "@effect/cli/ValidationError";
 import { FileSystem, HttpClient, HttpClientRequest } from "@effect/platform";
 import { NodeContext, NodeHttpClient, NodeRuntime } from '@effect/platform-node';
 import { load } from 'cheerio';
-import { Config, Console, Effect, Layer, pipe } from 'effect';
+import { Array, Config, Console, Effect, Layer, pipe } from 'effect';
 import path from 'path';
 
 const getCached = (filename: string, fetch: Effect.Effect<string, any, HttpClient.HttpClient>) => Effect.gen(function* () {
@@ -32,7 +32,22 @@ const getPuzzleDescription = (path: string, sessionCookie: string) => pipe(
       }),
     Effect.scoped,
   );
-    
+
+const getPuzzleExamples = (path: string) => Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    const exists = yield* fs.exists(`.${path}/description.html`);
+    if(!exists) {
+        yield* Effect.fail(`Description file not found for ${path}`);
+    }
+    const html = yield* fs.readFileString(`.${path}/description.html`);
+    yield* pipe(
+      Effect.try(() => load(html)),
+      Effect.andThen(($) => Effect.try(() => $('pre > code').toArray().map(element => $(element).text()))),
+      Effect.andThen(Array.map((example, index) => fs.writeFileString(`.${path}/snippet-${index + 1}.txt`, example))),
+      Effect.andThen(Effect.all)
+    )
+});
+
 const getPuzzleInput = (path: string, sessionCookie: string) => pipe(
     Effect.gen(function* () {
         const client = (yield* HttpClient.HttpClient).pipe(HttpClient.filterStatusOk);
@@ -83,10 +98,12 @@ const generateCommand = pipe(
     for(const puzzle of puzzles) {
         yield* getCached(`.${puzzle}/description.html`, getPuzzleDescription(puzzle, sessionCookie));
         yield* getCached(`.${puzzle}/input.txt`, getPuzzleInput(puzzle, sessionCookie));
+        yield* getPuzzleExamples(puzzle);
     }
     yield* Console.log(`Generated files for ${year} puzzles`);
   })),
 )
+
 
 const aocCommand = (args: string[]) =>
   Command.run(
