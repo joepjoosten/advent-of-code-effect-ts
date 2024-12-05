@@ -7,21 +7,23 @@ import { describe, expect } from "vitest";
 import { grammer, part1, part2 } from "./answer.js";
 
 describe('Does the parser work?', () => {
-    effect('should return the correct answer', () => Effect.gen(function* () {
+    effect('year 2024 - day 3 - should return the correct answer', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/3/snippet-1.txt');
         const parsedAndPrinted = Syntax.printString(grammer, Either.getOrThrow(Syntax.parseString(grammer, snippet)));
         expect(Either.getOrThrow(parsedAndPrinted)).toEqual(snippet);
     }).pipe(Effect.provide(NodeContext.layer)));
+});
 
-    effect('part 1 - snippet 1', () => Effect.gen(function* () {
+describe('Are the examples working?', () => {
+    effect('year 2024 - day 3 - part 1 - snippet 1', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/3/snippet-1.txt');
         const result = yield* part1(snippet);
         expect(result).toEqual(undefined);
     }).pipe(Effect.provide(NodeContext.layer)));
 
-    effect('part 2 - snippet 1', () => Effect.gen(function* () {
+    effect('year 2024 - day 3 - part 2 - snippet 1', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/3/snippet-1.txt');
         const result = yield* part2(snippet);

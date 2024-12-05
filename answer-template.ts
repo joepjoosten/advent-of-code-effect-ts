@@ -5,12 +5,12 @@ export const grammer = pipe(Syntax.anyString, Syntax.repeatWithSeparator1(Syntax
 
 export const part1 = (input: string) =>
   Effect.gen(function* () {
-    Effect.fail("Not implemented");
+    yield* Effect.fail("Not implemented");
   });
 
 export const part2 = (input: string) =>
   Effect.gen(function* () {
-    Effect.fail("Not implemented");
+    yield* Effect.fail("Not implemented");
   });
 `
 
@@ -22,14 +22,16 @@ import { Effect, Either } from "effect";
 import { describe, expect } from "vitest";
 import { grammer, part1, part2 } from "./answer.js";
 
-describe('Does the parser work?', () => {
+describe('year ${year} - day ${day} - does the parser work?', () => {
     effect('should return the correct answer', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./${year}/day/${day}/snippet-1.txt');
         const parsedAndPrinted = Syntax.printString(grammer, Either.getOrThrow(Syntax.parseString(grammer, snippet)));
         expect(Either.getOrThrow(parsedAndPrinted)).toEqual(snippet);
     }).pipe(Effect.provide(NodeContext.layer)));
+});
 
+describe('year ${year} - day ${day} - are the examples working?', () => {
     effect('part 1 - snippet 1', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./${year}/day/${day}/snippet-1.txt');

@@ -5,10 +5,10 @@ export const grammer = pipe(Syntax.anyString, Syntax.repeatWithSeparator1(Syntax
 
 export const part1 = (input: string) =>
   Effect.gen(function* () {
-    Effect.fail("Not implemented");
+    yield* Effect.fail("Not implemented");
   });
 
 export const part2 = (input: string) =>
   Effect.gen(function* () {
-    Effect.fail("Not implemented");
+    yield* Effect.fail("Not implemented");
   });
