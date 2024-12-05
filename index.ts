@@ -20,6 +20,7 @@ const getCached = (filename: string, fetch: Effect.Effect<string, any, HttpClien
     return yield* fs.readFileString(filename);
 });
 
+const style = '<head><link rel="stylesheet" type="text/css" href="https://adventofcode.com/static/style.css"/></head>';
 const getPuzzleDescription = (path: string, sessionCookie: string) => pipe(
     Effect.gen(function* () {
         const client = (yield* HttpClient.HttpClient).pipe(HttpClient.filterStatusOk);
@@ -28,7 +29,8 @@ const getPuzzleDescription = (path: string, sessionCookie: string) => pipe(
           HttpClientRequest.setHeader('Cookie', `session=${sessionCookie}`),
           client.execute,
           Effect.andThen(resp => resp.text),
-          Effect.andThen(text => Effect.try(() => load(text)(`article`).toString()))
+          Effect.andThen(text => Effect.try(() => load(text)(`article`).toString())),
+          Effect.andThen(html => [style, html].join('\n')),
         );
       }),
     Effect.scoped,
