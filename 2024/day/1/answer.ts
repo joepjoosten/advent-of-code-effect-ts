@@ -29,15 +29,23 @@ export const part1 = (input: string) => Effect.gen(function* () {
 export const part2 = (input: string) => Effect.gen(function* () {
     return yield* pipe(
         Syntax.parseString(grammer, input),
-        Either.map(x => pipe(
-            x,
+        Either.map(flow(
             Chunk.flatten,
             Chunk.partition((_, i) => i % 2 === 0),
             Tuple.mapBoth({
                 onFirst: (chunk) => histogram(chunk, Order.number),
                 onSecond: (chunk) => histogram(chunk, Order.number),
             }),
-            ([right, left]) => pipe(HashMap.toEntries(left), Array.map(([k, v]) => pipe(HashMap.get(right, k), Option.match({ onNone: () => 0, onSome: (y) => k * v * y })))),
+            ([right, left]) => pipe(
+                HashMap.toEntries(left), 
+                Array.map(([k, v]) => pipe(
+                    HashMap.get(right, k), 
+                    Option.match({ 
+                        onNone: () => 0, 
+                        onSome: (y) => k * v * y })
+                    )
+                )
+            ),
             sumArray
         ))
     );
