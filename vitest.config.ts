@@ -3,7 +3,7 @@ import type { ViteUserConfig } from "vitest/config"
 
 export default defineConfig({
   esbuild: {
-    target: "es2020"
+    target: "es2022"
   },
   test: {
     include: ["**/*.spec.ts"],

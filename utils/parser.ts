@@ -1,4 +1,4 @@
-import { Chunk } from "effect";
+import { Chunk, pipe } from "effect";
 import * as Syntax from "@effect/parser/Syntax";
 import { char } from "@effect/parser/Regex";
 
@@ -26,3 +26,5 @@ export const toInteger = Syntax.transform<string, number>(
   (x) => parseInt(x),
   String
 );
+
+export const integer = pipe(Syntax.digit, Syntax.repeat1, Syntax.captureString, toInteger);
