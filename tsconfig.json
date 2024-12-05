@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
-        "moduleResolution": "nodenext",
-        "module": "NodeNext",
-        "target": "ESNext"
-    }
+        "moduleResolution": "node",
+        "module": "ES2022",
+        "target": "ES2022"
+    },
+    "include": ["**/*.ts"],
 }

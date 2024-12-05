@@ -7,6 +7,7 @@ import { NodeContext, NodeHttpClient, NodeRuntime } from '@effect/platform-node'
 import { load } from 'cheerio';
 import { Array, Config, Console, Effect, Layer, pipe } from 'effect';
 import path from 'path';
+import { answerSpecTemplate, answerTemplate } from "./answer-template.js";
 
 const getCached = (filename: string, fetch: Effect.Effect<string, any, HttpClient.HttpClient>) => Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem;
@@ -101,8 +102,11 @@ const generateCommand = pipe(
     const puzzles = yield* getAvailablePuzzles(year, sessionCookie);
     yield* Console.log(`Found ${puzzles.length} puzzles for ${year}, generating files...`);
     for(const puzzle of puzzles) {
+        const day = parseInt(puzzle.split('/').pop());
         yield* getCached(`.${puzzle}/description.html`, getPuzzleDescription(puzzle, sessionCookie));
         yield* getCached(`.${puzzle}/input.txt`, getPuzzleInput(puzzle, sessionCookie));
+        yield* getCached(`.${puzzle}/answer.ts`, Effect.succeed(answerTemplate()));
+        yield* getCached(`.${puzzle}/answer.spec.ts`, Effect.succeed(answerSpecTemplate(year, day)));
         yield* getPuzzleExamples(puzzle);
     }
     yield* Console.log(`Generated files for ${year} puzzles`);
