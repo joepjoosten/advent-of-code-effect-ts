@@ -1,6 +1,6 @@
 import * as Syntax from "@effect/parser/Syntax";
-import { Array, Chunk, Effect, Either, flow, HashMap, Option, Order, pipe, Tuple } from "effect";
-import { integer, repeatedChar, toInteger } from "../../../utils/parser.js";
+import { Array, Chunk, Effect, flow, HashMap, Option, Order, pipe, Tuple } from "effect";
+import { integer, parseInput, repeatedChar } from "../../../utils/parser.js";
 import { distance, histogram, sumArray, sumChunk } from "../../../utils/utils.js";
 
 const seperator = repeatedChar(" ", 3);
@@ -10,8 +10,7 @@ export const grammer = pipe(line, Syntax.repeatWithSeparator1(newline));
 
 const shaping = (input: string) =>
   pipe(
-    Syntax.parseString(grammer, input),
-    Either.getOrThrow,
+    parseInput(grammer, input),
     Chunk.flatten,
     Chunk.partition((_, i) => i % 2 === 0)
   );

@@ -2,9 +2,9 @@ import * as Syntax from "@effect/parser/Syntax";
 import { FileSystem } from "@effect/platform";
 import { NodeContext } from "@effect/platform-node";
 import { effect } from '@effect/vitest';
-import { Chunk, Effect, Either } from "effect";
+import { Effect, Either } from "effect";
 import { describe, expect } from "vitest";
-import { grammer, isAlwaysDecreasing, isAlwaysIncreasing, part1, part2 } from "./answer.js";
+import { grammer, part1, part2 } from "./answer.js";
 
 describe('year 2024 - day 2 - does the parser work?', () => {
     effect('should return the correct answer', () => Effect.gen(function* () {
@@ -29,14 +29,4 @@ describe('year 2024 - day 2 - are the examples working?', () => {
         const result = yield* part2(snippet);
         expect(result).toEqual(4);
     }).pipe(Effect.provide(NodeContext.layer)));
-})
-
-describe('fun', () => {
-    effect('isAlwaysIncreasing', () => Effect.gen(function* () {
-        expect(isAlwaysIncreasing(1)(Chunk.unsafeFromNonEmptyArray([1, 2, 3, 4]))).toEqual(true);
-        expect(isAlwaysIncreasing(1)(Chunk.unsafeFromNonEmptyArray([1, 3, 2, 4]))).toEqual(true);
-        expect(isAlwaysIncreasing(1)(Chunk.unsafeFromNonEmptyArray([5, 3, 2, 7]))).toEqual(false);
-        expect(isAlwaysDecreasing(1)(Chunk.unsafeFromNonEmptyArray([8, 6, 4, 4, 1]))).toEqual(true);
-        expect(isAlwaysIncreasing(1)(Chunk.unsafeFromNonEmptyArray([1, 3, 2, 4, 5]))).toEqual(true);
-    }));
 })

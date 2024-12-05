@@ -1,17 +1,16 @@
-import * as Syntax from "@effect/parser/Syntax";
 import { FileSystem } from "@effect/platform";
 import { NodeContext } from "@effect/platform-node";
 import { effect } from '@effect/vitest';
-import { Effect, Either } from "effect";
+import { Effect } from "effect";
 import { describe, expect } from "vitest";
-import { grammer, part1, part2 } from "./answer.js";
+import { detectMul, part1, part2 } from "./answer.js";
 
 describe('year 2024 - day 3 - does the parser work?', () => {
     effect('should return the correct answer', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/3/snippet-1.txt');
-        const parsedAndPrinted = Syntax.printString(grammer, Either.getOrThrow(Syntax.parseString(grammer, snippet)));
-        expect(Either.getOrThrow(parsedAndPrinted)).toEqual(snippet);
+        const muls = [...snippet.matchAll(detectMul)].map(([, lhs, rhs]) => [parseInt(lhs), parseInt(rhs)]);
+        expect(muls).toEqual([[2,4], [5,5], [11,8], [8,5]]);
     }).pipe(Effect.provide(NodeContext.layer)));
 });
 
@@ -20,13 +19,13 @@ describe('year 2024 - day 3 - are the examples working?', () => {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/3/snippet-1.txt');
         const result = yield* part1(snippet);
-        expect(result).toEqual(undefined);
+        expect(result).toEqual(161);
     }).pipe(Effect.provide(NodeContext.layer)));
 
-    effect('part 2 - snippet 1', () => Effect.gen(function* () {
+    effect('part 2 - snippet 2', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
-        const snippet = yield* fs.readFileString('./2024/day/3/snippet-1.txt');
+        const snippet = yield* fs.readFileString('./2024/day/3/snippet-2.txt');
         const result = yield* part2(snippet);
-        expect(result).toEqual(undefined);
+        expect(result).toEqual(48);
     }).pipe(Effect.provide(NodeContext.layer)));
 })

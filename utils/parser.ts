@@ -1,6 +1,10 @@
-import { Chunk, pipe } from "effect";
+import { Chunk, Either, pipe } from "effect";
 import * as Syntax from "@effect/parser/Syntax";
-import { char } from "@effect/parser/Regex";
+
+export const parseInput = <T, Error>(grammer: Syntax.Syntax<string, Error, string, T>, input: string) => pipe(
+  Syntax.parseString(grammer, input),
+  Either.getOrThrow,
+);
 
 const repeatChar = (
   char: string,
