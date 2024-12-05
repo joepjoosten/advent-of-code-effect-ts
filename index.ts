@@ -83,6 +83,11 @@ const year = Options.integer('year').pipe(
   Options.withDefault(2024),
 );
 
+const day = Options.integer('day').pipe(
+  Options.withAlias('d'),
+  Options.withDescription('The day of the puzzle'),
+);
+
 const sessionCookie = Options.text('session-cookie').pipe(
   Options.withAlias('s'),
   Options.withDescription('The session cookie for the Advent of Code website'),
@@ -104,12 +109,24 @@ const generateCommand = pipe(
   })),
 )
 
+type AnswerModule = { part1: (input: string) => Effect.Effect<any>, part2: (input: string) => Effect.Effect<any> };
+const logAnswer = (day: number, part: number) => (answer: unknown) => Console.log(`Answer to day ${day}, part ${part}: \x1b[33m${answer}\x1b[37m`)
+const runDayCommand = pipe(
+  Command.make('run', { year, day }),
+  Command.withHandler(({ year, day }) => Effect.gen(function* () {
+    const answerModule: AnswerModule = yield* Effect.tryPromise(() => import(`./${year}/day/${day}/answer`));
+    const fs = yield* FileSystem.FileSystem;
+    const input = yield* fs.readFileString(`./${year}/day/${day}/input.txt`);
+    yield* pipe(answerModule.part1(input), Effect.andThen(logAnswer(day, 1)), Effect.ignoreLogged);
+    yield* pipe(answerModule.part2(input), Effect.andThen(logAnswer(day, 2)), Effect.ignoreLogged);
+  })),
+)
 
 const aocCommand = (args: string[]) =>
   Command.run(
     pipe(
       Command.make('aoc'),
-      Command.withSubcommands([generateCommand]),
+      Command.withSubcommands([generateCommand, runDayCommand]),
     ),
     {
       name: 'Advent of Code',
