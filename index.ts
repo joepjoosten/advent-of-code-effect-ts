@@ -39,17 +39,17 @@ const getPuzzleDescription = (path: string, sessionCookie: string, part2: boolea
     Effect.scoped,
   );
 
-const getPuzzleExamples = (path: string) => Effect.gen(function* () {
+const getPuzzleExamples = (path: string, part2: boolean) => Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem;
-    const exists = yield* fs.exists(`.${path}/description.html`);
+    const exists = yield* fs.exists(`.${path}/description-part-${part2 ? 2 : 1}.html`);
     if(!exists) {
         yield* Effect.fail(`Description file not found for ${path}`);
     }
-    const html = yield* fs.readFileString(`.${path}/description.html`);
+    const html = yield* fs.readFileString(`.${path}/description-part-${part2 ? 2 : 1}.html`);
     yield* pipe(
       Effect.try(() => load(html)),
       Effect.andThen(($) => Effect.try(() => $('pre > code').toArray().map(element => $(element).text()))),
-      Effect.andThen(Array.map((example, index) => fs.writeFileString(`.${path}/snippet-${index + 1}.txt`, example))),
+      Effect.andThen(Array.map((example, index) => fs.writeFileString(`.${path}/part-${part2 ? 2 : 1}-snippet-${index + 1}.txt`, example))),
       Effect.andThen(Effect.all)
     )
 });
@@ -111,13 +111,16 @@ const generateCommand = pipe(
     const puzzles = yield* getAvailablePuzzles(year, sessionCookie);
     yield* Console.log(`Found ${puzzles.length} puzzles for ${year}, generating files...`);
     for(const [puzzle, part2] of puzzles) {
-        const day = parseInt(puzzle.split('/').pop());
+        const day = parseInt(puzzle.split('/').pop()!);
         yield* getCached(`.${puzzle}/description-part-1.html`, getPuzzleDescription(puzzle, sessionCookie, false));
-        if(part2) { yield* getCached(`.${puzzle}/description-part-2.html`, getPuzzleDescription(`${puzzle}`, sessionCookie, true)); }
+        yield* getPuzzleExamples(puzzle, false);
+        if(part2) { 
+          yield* getCached(`.${puzzle}/description-part-2.html`, getPuzzleDescription(`${puzzle}`, sessionCookie, true));
+          yield* getPuzzleExamples(puzzle, true);
+        }
         yield* getCached(`.${puzzle}/input.txt`, getPuzzleInput(puzzle, sessionCookie));
         yield* getCached(`.${puzzle}/answer.ts`, Effect.succeed(answerTemplate()));
         yield* getCached(`.${puzzle}/answer.spec.ts`, Effect.succeed(answerSpecTemplate(year, day)));
-        yield* getPuzzleExamples(puzzle);
     }
     yield* Console.log(`Generated files for ${year} puzzles`);
   })),
@@ -141,7 +144,7 @@ const cleanCommand = pipe(
   Command.withHandler(() => Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem;
     yield* pipe(
-      Effect.tryPromise(async () => await globby(['**/description-part-1.html', '**/description-part-2.html', '**/snippet-*.txt', '**/input.txt'], { ignore: ['node_modules'] })),
+      Effect.tryPromise(async () => await globby(['**/description-part-1.html', '**/description-part-2.html', '**/part-1-snippet-*.txt', '**/part-2-snippet-*.txt', '**/input.txt'], { ignore: ['node_modules'] })),
       Effect.andThen(Array.map(file => fs.remove(file))),
       Effect.andThen(Effect.all),
     );

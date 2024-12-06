@@ -17,14 +17,14 @@ describe('year 2024 - day 3 - does the parser work?', () => {
 describe('year 2024 - day 3 - are the examples working?', () => {
     effect('part 1 - snippet 1', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
-        const snippet = yield* fs.readFileString('./2024/day/3/snippet-1.txt');
+        const snippet = yield* fs.readFileString('./2024/day/3/part-1-snippet-1.txt');
         const result = yield* part1(snippet);
         expect(result).toEqual(161);
     }).pipe(Effect.provide(NodeContext.layer)));
 
     effect('part 2 - snippet 2', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
-        const snippet = yield* fs.readFileString('./2024/day/3/snippet-2.txt');
+        const snippet = yield* fs.readFileString('./2024/day/3/part-2-snippet-1.txt');
         const result = yield* part2(snippet);
         expect(result).toEqual(48);
     }).pipe(Effect.provide(NodeContext.layer)));

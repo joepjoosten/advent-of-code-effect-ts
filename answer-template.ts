@@ -34,14 +34,14 @@ describe('year ${year} - day ${day} - does the parser work?', () => {
 describe('year ${year} - day ${day} - are the examples working?', () => {
     effect('part 1 - snippet 1', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
-        const snippet = yield* fs.readFileString('./${year}/day/${day}/snippet-1.txt');
+        const snippet = yield* fs.readFileString('./${year}/day/${day}/part-1-snippet-1.txt');
         const result = yield* part1(snippet);
         expect(result).toEqual(undefined);
     }).pipe(Effect.provide(NodeContext.layer)));
 
     effect('part 2 - snippet 1', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
-        const snippet = yield* fs.readFileString('./${year}/day/${day}/snippet-1.txt');
+        const snippet = yield* fs.readFileString('./${year}/day/${day}/part-1-snippet-1.txt');
         const result = yield* part2(snippet);
         expect(result).toEqual(undefined);
     }).pipe(Effect.provide(NodeContext.layer)));
