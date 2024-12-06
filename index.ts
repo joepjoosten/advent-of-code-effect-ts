@@ -8,6 +8,7 @@ import { load } from 'cheerio';
 import { Array, Config, Console, Effect, Layer, pipe } from 'effect';
 import path from 'path';
 import { answerSpecTemplate, answerTemplate } from "./answer-template.js";
+import { globby } from 'globby';
 
 const getCached = (filename: string, fetch: Effect.Effect<string, any, HttpClient.HttpClient>) => Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem;
@@ -21,7 +22,7 @@ const getCached = (filename: string, fetch: Effect.Effect<string, any, HttpClien
 });
 
 const style = '<head><link rel="stylesheet" type="text/css" href="https://adventofcode.com/static/style.css"/></head>';
-const getPuzzleDescription = (path: string, sessionCookie: string) => pipe(
+const getPuzzleDescription = (path: string, sessionCookie: string, part2: boolean) => pipe(
     Effect.gen(function* () {
         const client = (yield* HttpClient.HttpClient).pipe(HttpClient.filterStatusOk);
         return yield* pipe(
@@ -29,7 +30,9 @@ const getPuzzleDescription = (path: string, sessionCookie: string) => pipe(
           HttpClientRequest.setHeader('Cookie', `session=${sessionCookie}`),
           client.execute,
           Effect.andThen(resp => resp.text),
-          Effect.andThen(text => Effect.try(() => load(text)(`article`).toString())),
+          Effect.andThen(text => Effect.try(() => load(text))),
+          Effect.andThen(($) => $('.day-desc').toArray().map(element => $(element).html())),
+          Effect.andThen(parts => parts[part2 ? 1 : 0]),
           Effect.andThen(html => [style, html].join('\n')),
         );
       }),
@@ -73,7 +76,11 @@ const getAvailablePuzzles = (year: number, sessionCookie: string) => pipe(
           HttpClientRequest.setHeader('Cookie', `session=${sessionCookie}`),
           client.execute,
           Effect.andThen(resp => resp.text),
-          Effect.andThen(text => Effect.try(() => load(text)(`a[href]`).toArray().map(a => a.attribs.href).filter(href => href.startsWith(`/${year}/day/`)))),
+          Effect.andThen(text => Effect.try(() => load(text))),
+          Effect.andThen(($) => $(`.calendar > a[href]`).toArray().map(element => [
+            element.attribs.href, 
+            $(element).hasClass('calendar-complete') || $(element).hasClass('calendar-verycomplete')
+          ] as const))
         );
       }),
     Effect.scoped,
@@ -103,9 +110,10 @@ const generateCommand = pipe(
     
     const puzzles = yield* getAvailablePuzzles(year, sessionCookie);
     yield* Console.log(`Found ${puzzles.length} puzzles for ${year}, generating files...`);
-    for(const puzzle of puzzles) {
+    for(const [puzzle, part2] of puzzles) {
         const day = parseInt(puzzle.split('/').pop());
-        yield* getCached(`.${puzzle}/description.html`, getPuzzleDescription(puzzle, sessionCookie));
+        yield* getCached(`.${puzzle}/description-part-1.html`, getPuzzleDescription(puzzle, sessionCookie, false));
+        if(part2) { yield* getCached(`.${puzzle}/description-part-2.html`, getPuzzleDescription(`${puzzle}`, sessionCookie, true)); }
         yield* getCached(`.${puzzle}/input.txt`, getPuzzleInput(puzzle, sessionCookie));
         yield* getCached(`.${puzzle}/answer.ts`, Effect.succeed(answerTemplate()));
         yield* getCached(`.${puzzle}/answer.spec.ts`, Effect.succeed(answerSpecTemplate(year, day)));
@@ -128,11 +136,23 @@ const runDayCommand = pipe(
   })),
 )
 
+const cleanCommand = pipe(
+  Command.make('clean'),
+  Command.withHandler(() => Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    yield* pipe(
+      Effect.tryPromise(async () => await globby(['**/description-part-1.html', '**/description-part-2.html', '**/snippet-*.txt', '**/input.txt'], { ignore: ['node_modules'] })),
+      Effect.andThen(Array.map(file => fs.remove(file))),
+      Effect.andThen(Effect.all),
+    );
+  }))
+)
+
 const aocCommand = (args: string[]) =>
   Command.run(
     pipe(
       Command.make('aoc'),
-      Command.withSubcommands([generateCommand, runDayCommand]),
+      Command.withSubcommands([generateCommand, runDayCommand, cleanCommand]),
     ),
     {
       name: 'Advent of Code',
