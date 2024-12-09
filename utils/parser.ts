@@ -26,9 +26,20 @@ export const toArray = <T>() =>
     Chunk.toArray,
     Chunk.unsafeFromNonEmptyArray
   );
+
 export const toInteger = Syntax.transform<string, number>(
   (x) => parseInt(x),
   String
 );
 
 export const integer = pipe(Syntax.digit, Syntax.repeat1, Syntax.captureString, toInteger);
+
+export const separatedBy = <X, Y>(lhs: Syntax.Syntax<string, string | Error, string, X>, sep: Syntax.Syntax<string, string | Error, string, void>, rhs: Syntax.Syntax<string, string | Error, string, Y>) => pipe(
+  lhs,
+  Syntax.zip(sep),
+  Syntax.zip(rhs),
+  Syntax.transform<readonly [readonly [X, unknown], Y], readonly [X, Y]>(
+      ([[x], y]) => [x, y] as const,
+      ([x, y]) => [[x, void 0], y] as const
+    )
+)
