@@ -25,28 +25,28 @@ export const transpose = <T>(xs: Array<Array<T>>): Array<Array<T>> =>
         Array.map((_, i) => Array.map((ys) => ys[i])(xs))
       );
 
-export const getHorizontals = <T>(input: Array<Array<T>>) => input;
-export const getVerticals = <T>(input: Array<Array<T>>) => input[0].map((_, i) => input.map((row) => row[i]));
+export const getHorizontals = <T>(xs: Array<Array<T>>) => xs;
+export const getVerticals = <T>(xs: Array<Array<T>>) => xs[0].map((_, i) => xs.map((ys) => ys[i]));
 
-export const getLowerLeftDiagonals = <T>(input: Array<Array<T>>, startWith = 0): Array<Array<T>> =>
+export const getLowerLeftDiagonals = <T>(xys: Array<Array<T>>, startWith = 0): Array<Array<T>> =>
   pipe(
-    Array.range(startWith, input.length - 1),
+    Array.range(startWith, xys.length - 1),
     Array.map((i) =>
       pipe(
-        Array.range(0, Math.min(input[0].length, input.length - i) - 1),
-        Array.map((j) => input.at(i + j).at(j))
+        Array.range(0, Math.min(xys[0].length, xys.length - i) - 1),
+        Array.map((j) => xys.at(i + j).at(j))
       )
     )
   );
 
-export const leftToRightDiagonals = <T>(input: Array<Array<T>>): Array<Array<T>> =>
+export const leftToRightDiagonals = <T>(xys: Array<Array<T>>): Array<Array<T>> =>
   [
-    ...getLowerLeftDiagonals(input),
-    ...getLowerLeftDiagonals(transpose(input), 1),
+    ...getLowerLeftDiagonals(xys),
+    ...getLowerLeftDiagonals(transpose(xys), 1),
   ];
 
-export const rightToLeftDiagonals = <T>(input: Array<Array<T>>): Array<Array<T>> => pipe(
-  input,
+export const rightToLeftDiagonals = <T>(xys: Array<Array<T>>): Array<Array<T>> => pipe(
+  xys,
   Array.reverse,
   leftToRightDiagonals
 )
