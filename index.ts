@@ -6,7 +6,7 @@ import { FileSystem, HttpClient, HttpClientRequest } from "@effect/platform";
 import { NodeContext, NodeHttpClient, NodeRuntime } from '@effect/platform-node';
 import { load } from 'cheerio';
 import { Array, Config, Console, Effect, Layer, pipe } from 'effect';
-import path from 'path';
+import * as path from 'path';
 import { answerSpecTemplate, answerTemplate } from "./answer-template.js";
 import { globby } from 'globby';
 
@@ -21,7 +21,7 @@ const getCached = (filename: string, fetch: Effect.Effect<string, any, HttpClien
     return yield* fs.readFileString(filename);
 });
 
-const style = '<head><link rel="stylesheet" type="text/css" href="https://adventofcode.com/static/style.css"/></head>';
+const style = '<head><link rel="stylesheet" type="text/css" href="https://adventofcode.com/static/style.css"/><style>body { font-size: 80% }</style></head>';
 const getPuzzleDescription = (path: string, sessionCookie: string, part2: boolean) => pipe(
     Effect.gen(function* () {
         const client = (yield* HttpClient.HttpClient).pipe(HttpClient.filterStatusOk);
