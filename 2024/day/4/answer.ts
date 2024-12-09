@@ -1,5 +1,5 @@
 import * as Syntax from "@effect/parser/Syntax";
-import { Array, Effect, Order, pipe } from "effect";
+import { Array, Effect, pipe } from "effect";
 import { getHorizontals, getVerticals, leftToRightDiagonals, rightToLeftDiagonals } from "../../../utils/Array";
 import { parseInput, toArray } from "../../../utils/parser";
 import { sumArray } from "../../../utils/utils";
@@ -34,12 +34,10 @@ export const part2 = (input: string) =>
         ...rightToLeftDiagonals(xys),
         ], [...leftToRightDiagonals(coords), ...rightToLeftDiagonals(coords)])
       },
-      Array.map(([xs, coords]) => {
-        const s = Array.join(xs, "");
-        return [...indexesOf("MAS")(s).map((i) => coords[i + 1]), ...indexesOf("SAM")(s).map((i) => coords[i + 1])];
-      }),
-      x => x,
-      Array.flatten,
+      Array.flatMap(([xs, coords]) => pipe(
+        Array.join(xs, ""),
+        s => [...indexesOf("MAS")(s).map((i) => coords[i + 1]), ...indexesOf("SAM")(s).map((i) => coords[i + 1])]
+      )),
       (coords) => coords.length - Array.dedupe(coords).length
     )
   });
