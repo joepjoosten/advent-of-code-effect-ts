@@ -9,7 +9,7 @@ import { grammer, part1, part2 } from "./answer.js";
 describe('year 2024 - day 6 - does the parser work?', () => {
     effect('should return the correct answer', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
-        const snippet = yield* fs.readFileString('./2024/day/6/snippet-1.txt');
+        const snippet = yield* fs.readFileString('./2024/day/6/part-1-snippet-1.txt');
         const parsedAndPrinted = Syntax.printString(grammer, Either.getOrThrow(Syntax.parseString(grammer, snippet)));
         expect(Either.getOrThrow(parsedAndPrinted)).toEqual(snippet);
     }).pipe(Effect.provide(NodeContext.layer)));

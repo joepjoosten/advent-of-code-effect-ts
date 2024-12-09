@@ -20,8 +20,8 @@ export const aperture =
 export const transpose = <T>(xs: Array<Array<T>>): Array<Array<T>> =>
   xs.length === 0 ? [] : pipe(xs[0], Array.map((_, i) => Array.map((ys) => ys[i])(xs)));
 
-export const getHorizontalFromRectangle = <T>(input: Array<Array<T>>) => input;
-export const getVerticalsFromRectangle = <T>(input: Array<Array<T>>) => input[0].map((_, i) => input.map((row) => row[i]));
+export const getHorizontals = <T>(input: Array<Array<T>>) => input;
+export const getVerticals = <T>(input: Array<Array<T>>) => input[0].map((_, i) => input.map((row) => row[i]));
 
 export const getLowerLeftDiagonals = <T>(input: Array<Array<T>>): Array<Array<T>> =>
   pipe(
@@ -38,5 +38,5 @@ export const getDiagonals = <T>(input:  Array<Array<T>>) => [
   ...getLowerLeftDiagonals(input),
   ...getLowerLeftDiagonals(transpose(input)).slice(1),
   ...getLowerLeftDiagonals(input.map((row) => row.reverse())),
-  ...getLowerLeftDiagonals(transpose(input.map((row) => row.reverse()))).slice(1),
+  ...getLowerLeftDiagonals(transpose(input).map((row) => row.reverse())).slice(1),
 ]
