@@ -27,13 +27,13 @@ export const part2 = (input: string) =>
   Effect.gen(function* () {
     return pipe(
       parseInput(grammer, input),
-      (xys) => {
-        const coords = pipe(xys, Array.map((xs, i) => xs.map((_, j) => [i, j] as const)));
-        return Array.zip([
+      (xys) => pipe(
+        pipe(xys, Array.map((xs, i) => xs.map((_, j) => [i, j] as const))),
+        (coords) => Array.zip([
         ...leftToRightDiagonals(xys),
         ...rightToLeftDiagonals(xys),
         ], [...leftToRightDiagonals(coords), ...rightToLeftDiagonals(coords)])
-      },
+      ),
       Array.flatMap(([xs, coords]) => pipe(
         Array.join(xs, ""),
         s => [...indexesOf("MAS")(s).map((i) => coords[i + 1]), ...indexesOf("SAM")(s).map((i) => coords[i + 1])]
