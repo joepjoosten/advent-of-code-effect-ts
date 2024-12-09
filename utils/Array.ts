@@ -18,7 +18,12 @@ export const aperture =
   };
 
 export const transpose = <T>(xs: Array<Array<T>>): Array<Array<T>> =>
-  xs.length === 0 ? [] : pipe(xs[0], Array.map((_, i) => Array.map((ys) => ys[i])(xs)));
+  xs.length === 0
+    ? []
+    : pipe(
+        xs[0],
+        Array.map((_, i) => Array.map((ys) => ys[i])(xs))
+      );
 
 export const getHorizontals = <T>(input: Array<Array<T>>) => input;
 export const getVerticals = <T>(input: Array<Array<T>>) => input[0].map((_, i) => input.map((row) => row[i]));
@@ -26,17 +31,22 @@ export const getVerticals = <T>(input: Array<Array<T>>) => input[0].map((_, i) =
 export const getLowerLeftDiagonals = <T>(input: Array<Array<T>>): Array<Array<T>> =>
   pipe(
     Array.range(0, input.length - 1),
-    Array.map(i =>
+    Array.map((i) =>
       pipe(
         Array.range(0, Math.min(input[0].length, input.length - i) - 1),
-        Array.map(j => input.at(i + j).at(j))
+        Array.map((j) => input.at(i + j).at(j))
       )
     )
   );
 
-export const getDiagonals = <T>(input:  Array<Array<T>>) => [
-  ...getLowerLeftDiagonals(input),
-  ...getLowerLeftDiagonals(transpose(input)).slice(1),
-  ...getLowerLeftDiagonals(input.map((row) => row.reverse())),
-  ...getLowerLeftDiagonals(transpose(input).map((row) => row.reverse())).slice(1),
-]
+export const leftToRightDiagonals = <T>(input: Array<Array<T>>): Array<Array<T>> =>
+  [
+    ...getLowerLeftDiagonals(input),
+    ...getLowerLeftDiagonals(transpose(input)).slice(1),
+  ];
+
+export const rightToLeftDiagonals = <T>(input: Array<Array<T>>): Array<Array<T>> => pipe(
+  input,
+  Array.reverse,
+  leftToRightDiagonals
+)
