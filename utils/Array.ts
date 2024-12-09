@@ -1,5 +1,6 @@
-import { Array, pipe } from "effect";
+import { Array, HashMap, Iterable, Option, pipe } from "effect";
 import { invoke } from "./Function.js";
+import { upsert } from "./HashMap.js";
 
 export const slice =
   (start: number) =>
@@ -49,4 +50,9 @@ export const rightToLeftDiagonals = <T>(xys: Array<Array<T>>): Array<Array<T>> =
   xys,
   Array.reverse,
   leftToRightDiagonals
+)
+
+export const histogram = <T>(xs: Iterable<T>): HashMap.HashMap<T, number> => pipe(
+  xs,
+  Iterable.reduce(HashMap.empty<T, number>(), (acc, x) => pipe(upsert(acc)(x, Option.match({ onNone: () => 1, onSome: (v) => v + 1 }))))
 )

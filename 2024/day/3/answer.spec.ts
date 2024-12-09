@@ -8,7 +8,7 @@ import { detectMul, part1, part2 } from "./answer.js";
 describe('year 2024 - day 3 - does the parser work?', () => {
     effect('should return the correct answer', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
-        const snippet = yield* fs.readFileString('./2024/day/3/snippet-1.txt');
+        const snippet = yield* fs.readFileString('./2024/day/3/part-1-snippet-1.txt');
         const muls = [...snippet.matchAll(detectMul)].map(([, lhs, rhs]) => [parseInt(lhs), parseInt(rhs)]);
         expect(muls).toEqual([[2,4], [5,5], [11,8], [8,5]]);
     }).pipe(Effect.provide(NodeContext.layer)));

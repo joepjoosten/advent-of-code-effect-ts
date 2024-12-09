@@ -1,7 +1,8 @@
 import * as Syntax from "@effect/parser/Syntax";
 import { Array, Chunk, Effect, flow, HashMap, Option, Order, pipe, Tuple } from "effect";
 import { integer, parseInput, repeatedChar } from "../../../utils/parser.js";
-import { distance, histogram, sumArray, sumChunk } from "../../../utils/utils.js";
+import { distance, sumArray, sumChunk } from "../../../utils/utils.js";
+import { histogram } from "../../../utils/Array.js";
 
 const seperator = repeatedChar(" ", 3);
 const newline = Syntax.char("\n");
@@ -34,8 +35,8 @@ export const part2 = (input: string) =>
     return pipe(
       shaping(input),
       Tuple.mapBoth({
-        onFirst: (chunk) => histogram(chunk, Order.number),
-        onSecond: (chunk) => histogram(chunk, Order.number),
+        onFirst: (chunk) => histogram(chunk),
+        onSecond: (chunk) => histogram(chunk),
       }),
       ([right, left]) =>
         pipe(
