@@ -11,7 +11,7 @@ describe('year 2024 - day 6 - does the parser work?', () => {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/6/part-1-snippet-1.txt');
         const parsedAndPrinted = Syntax.printString(grammer, Either.getOrThrow(Syntax.parseString(grammer, snippet)));
-        expect(Either.getOrThrow(parsedAndPrinted)).toEqual(snippet);
+        expect(Either.getOrThrow(parsedAndPrinted) + "\n").toEqual(snippet);
     }).pipe(Effect.provide(NodeContext.layer)));
 });
 
@@ -20,7 +20,7 @@ describe('year 2024 - day 6 - are the examples working?', () => {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/6/part-1-snippet-1.txt');
         const result = yield* part1(snippet);
-        expect(result).toEqual(undefined);
+        expect(result).toEqual(41);
     }).pipe(Effect.provide(NodeContext.layer)));
 
     effect('part 2 - snippet 1', () => Effect.gen(function* () {

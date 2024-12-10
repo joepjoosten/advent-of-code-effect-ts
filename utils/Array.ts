@@ -56,3 +56,22 @@ export const histogram = <T>(xs: Iterable<T>): HashMap.HashMap<T, number> => pip
   xs,
   Iterable.reduce(HashMap.empty<T, number>(), (acc, x) => pipe(upsert(acc)(x, Option.match({ onNone: () => 1, onSome: (v) => v + 1 }))))
 )
+
+export const getXY = <T>(xys: Array<Array<T>>) => ([x, y]: readonly[number, number]): Option.Option<T> =>
+  pipe(xys, Array.get(x), Option.flatMap(Array.get(y)));
+
+export const setXY = <T>(xys: Array<Array<T>>) => ([x, y]: readonly[number, number], value: T): Array<Array<T>> =>
+  pipe(xys, Array.modify(x, Array.modify(y, () => value)));
+
+
+export const findFirstIndex = <T>(xys: Array<Array<T>>) => (predicate: (x: T) => boolean): Option.Option<readonly [number, number]> => {
+  for (let y = 0; y < xys.length; y++) {
+    const row = xys[y];
+    for (let x = 0; x < row.length; x++) {
+      if (predicate(row[x])) {
+        return Option.some([x, y] as const);
+      }
+    }
+  }
+  return Option.none();
+}
