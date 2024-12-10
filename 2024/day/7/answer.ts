@@ -1,7 +1,6 @@
 import * as Syntax from "@effect/parser/Syntax";
-import { Array, Chunk, Effect, Option, pipe } from "effect";
+import { Array, Effect, Option, pipe } from "effect";
 import { integer, parseInput, toArray } from "../../../utils/parser";
-import { is } from "cheerio/dist/commonjs/api/traversing";
 import { sumArray } from "../../../utils/utils";
 
 export const newline = Syntax.char("\n");
@@ -21,9 +20,9 @@ const isValid = (test: number, numbers: number[], ops: string[], index = 0, curr
   if (index > numbers.length - 1 || current > test) return Option.none();
   return pipe(
     Option.none(),
-    Option.orElse(() => Array.contains(ops, '*') ? isValid(test, numbers, ops, index + 1, current * numbers[index], sequence + "*") : Option.none()),
-    Option.orElse(() => Array.contains(ops, '+') ? isValid(test, numbers, ops, index + 1, current + numbers[index], sequence + "+") : Option.none()),
-    Option.orElse(() => Array.contains(ops, '||') ? isValid(test, numbers, ops, index + 1, parseInt(`${current}${numbers[index]}`, 10), sequence + "||") : Option.none())
+    Option.orElse(() => Array.contains(ops, '*') ? isValid(test, numbers, ops, index + 1, current * numbers[index], `${sequence} * ${numbers[index]}`) : Option.none()),
+    Option.orElse(() => Array.contains(ops, '+') ? isValid(test, numbers, ops, index + 1, current + numbers[index], `${sequence} + ${numbers[index]}`) : Option.none()),
+    Option.orElse(() => Array.contains(ops, '||') ? isValid(test, numbers, ops, index + 1, parseInt(`${current}${numbers[index]}`, 10), `${sequence}${numbers[index]}`) : Option.none())
   );
 };
 
@@ -32,7 +31,7 @@ export const part1 = (input: string) =>
     return pipe(
       parseInput(grammer, input),
       Array.filter(({ test, numbers }) =>
-        Option.isSome(isValid(test, numbers, ['*', '+'], 1, Array.headNonEmpty(numbers), ""))
+        Option.isSome(isValid(test, numbers, ['*', '+'], 1, Array.headNonEmpty(numbers), `${Array.headNonEmpty(numbers)}`))
       ),
       Array.map(({ test }) => test),
       sumArray
@@ -43,7 +42,7 @@ export const part2 = (input: string) =>
   Effect.gen(function* () {
     return pipe(
       parseInput(grammer, input),
-      Array.filter(({ test, numbers }) => Option.isSome(isValid(test, numbers, ['*', '+', '||'], 1, Array.headNonEmpty(numbers), ""))),
+      Array.filter(({ test, numbers }) => Option.isSome(isValid(test, numbers, ['*', '+', '||'], 1, Array.headNonEmpty(numbers), `${Array.headNonEmpty(numbers)}`))),
       Array.map(({ test }) => test),
       sumArray
     );
