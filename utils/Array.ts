@@ -57,18 +57,30 @@ export const histogram = <T>(xs: Iterable<T>): HashMap.HashMap<T, number> => pip
   Iterable.reduce(HashMap.empty<T, number>(), (acc, x) => pipe(upsert(acc)(x, Option.match({ onNone: () => 1, onSome: (v) => v + 1 }))))
 )
 
-export const getXY = <T>(xys: Array<Array<T>>) => ([x, y]: readonly[number, number]): Option.Option<T> =>
+export const getXY = ([x, y]: readonly[number, number]) => <T>(xys: Array<Array<T>>): Option.Option<T> =>
   pipe(xys, Array.get(x), Option.flatMap(Array.get(y)));
 
-export const setXY = <T>(xys: Array<Array<T>>) => ([x, y]: readonly[number, number], value: T): Array<Array<T>> =>
-  pipe(xys, Array.modify(x, Array.modify(y, () => value)));
+export const setXY = <T>([x, y]: readonly[number, number], value: T) => (xys: Array<Array<T>>): Array<Array<T>> =>
+  Array.modify(xys, x, (ys) => Array.modify(ys, y, () => value));
 
+export const findAllIndexes = <T>(xys: Array<Array<T>>) => (predicate: (x: T) => boolean): Array<readonly [number, number]> => {
+  const indexes: Array<readonly [number, number]> = [];
+  for (let x = 0; x < xys.length; x++) {
+    const ys = xys[x];
+    for (let y = 0; y < ys.length; y++) {
+      if (predicate(ys[y])) {
+        indexes.push([x, y] as const);
+      }
+    }
+  }
+  return indexes;
+}
 
 export const findFirstIndex = <T>(xys: Array<Array<T>>) => (predicate: (x: T) => boolean): Option.Option<readonly [number, number]> => {
-  for (let y = 0; y < xys.length; y++) {
-    const row = xys[y];
-    for (let x = 0; x < row.length; x++) {
-      if (predicate(row[x])) {
+  for (let x = 0; x < xys.length; x++) {
+    const ys = xys[x];
+    for (let y = 0; y < ys.length; y++) {
+      if (predicate(ys[y])) {
         return Option.some([x, y] as const);
       }
     }

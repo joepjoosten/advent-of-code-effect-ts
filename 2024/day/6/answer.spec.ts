@@ -27,6 +27,6 @@ describe('year 2024 - day 6 - are the examples working?', () => {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/6/part-1-snippet-1.txt');
         const result = yield* part2(snippet);
-        expect(result).toEqual(undefined);
+        expect(result).toEqual(6);
     }).pipe(Effect.provide(NodeContext.layer)));
 })
