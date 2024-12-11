@@ -26,6 +26,12 @@ export const transpose = <T>(xs: Array<Array<T>>): Array<Array<T>> =>
         Array.map((_, i) => Array.map((ys) => ys[i])(xs))
       );
 
+export const makeBy2d = <T>(width: number, height: number, f: ([x, y]: readonly [number, number]) => T): Array.NonEmptyArray<Array.NonEmptyArray<T>> =>
+  Array.makeBy(height, (i) => Array.makeBy(width, (j) => f([i, j])));
+
+export const height = <T>(xs: Array<Array<T>>) => xs.length;
+export const width = <T>(xs: Array<Array<T>>) => xs[0].length;
+
 export const getHorizontals = <T>(xs: Array<Array<T>>) => xs;
 export const getVerticals = <T>(xs: Array<Array<T>>) => xs[0].map((_, i) => xs.map((ys) => ys[i]));
 
