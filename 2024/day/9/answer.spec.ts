@@ -20,13 +20,13 @@ describe('year 2024 - day 9 - are the examples working?', () => {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/9/part-1-snippet-1.txt');
         const result = yield* part1(snippet);
-        expect(result).toEqual(undefined);
+        expect(result).toEqual(1928);
     }).pipe(Effect.provide(NodeContext.layer)));
 
     effect('part 2 - snippet 1', () => Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/9/part-1-snippet-1.txt');
         const result = yield* part2(snippet);
-        expect(result).toEqual(undefined);
+        expect(result).toEqual(2858);
     }).pipe(Effect.provide(NodeContext.layer)));
 })
