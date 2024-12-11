@@ -1,7 +1,7 @@
 import * as Syntax from "@effect/parser/Syntax";
-import { Array, Console, Effect, Either, HashSet, Match, Option, pipe } from "effect";
-import { parseInput, toArray } from "../../../utils/parser";
+import { Array, Effect, HashSet, Match, Option, pipe } from "effect";
 import { findAllIndexes, findFirstIndex, getXY, setXY } from "../../../utils/Array";
+import { parseInput, toArray } from "../../../utils/parser";
 
 const newline = Syntax.char("\n");
 const guardChars = ["<", "^", ">", "v"];
