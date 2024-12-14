@@ -1,7 +1,7 @@
 import * as Syntax from "@effect/parser/Syntax";
-import { Array, Console, Effect, Number, Option, pipe, Tuple } from "effect";
-import { parseInput, toArray, toInteger } from "../../../utils/parser";
+import { Array, Effect, Number, Option, pipe, Tuple } from "effect";
 import { findAllIndexes, getXY } from "../../../utils/Array";
+import { parseInput, toArray, toInteger } from "../../../utils/parser";
 
 const newline = Syntax.char("\n");
 const height = pipe(Syntax.digit, toInteger);
@@ -9,47 +9,60 @@ export const grammer = pipe(height, Syntax.repeat1, toArray(), Syntax.repeatWith
 
 type Position = readonly [number, number];
 type Map = Array<Array<number>>;
-type Trail = Array<Position>;
+type Trail = Array.NonEmptyArray<Position>;
 
-const findTrailheads = (map: Map) => findAllIndexes(map)((s) => s === 0);
-
-const up = ([x, y]: Position) => [x - 1, y] as const;
-const down = ([x, y]: Position) => [x + 1, y] as const;
-const left = ([x, y]: Position) => [x, y - 1] as const;
-const right = ([x, y]: Position) => [x, y + 1] as const;
-
+const directoins = ([x, y]: Position) =>
+  [
+    [x - 1, y],
+    [x + 1, y],
+    [x, y - 1],
+    [x, y + 1],
+  ] as const;
 const positionEq = Tuple.getEquivalence(Number.Equivalence, Number.Equivalence);
+const positionTupleEq = Tuple.getEquivalence(positionEq, positionEq);
 
-const findTrail = (currentPos: Position, map: Map, trail: Trail = [], trails: Array<Option.Option<Trail>> = []):  Array<Option.Option<Trail>> => {
+const findTrail = (currentPos: Position, map: Map, trail: Trail): Array<Trail> => {
   const currentValue = Option.getOrThrow(getXY(currentPos)(map));
-  if(currentValue === 9) {
-    return [...trails, Option.some(trail)];
+  if (currentValue === 9) {
+    return [trail];
   }
-  
-  const nextValues = pipe(
-    [up(currentPos), down(currentPos), left(currentPos), right(currentPos)],
-    Array.filter(pos => Array.containsWith(positionEq)(pos)(trail) === false),
-    (nextPositions) => Array.zip(nextPositions, pipe(nextPositions, Array.map(pos => getXY(pos)(map)))),
+
+  const nextSteps = pipe(
+    directoins(currentPos),
+    Array.filter((pos) => Array.containsWith(positionEq)(pos)(trail) === false),
+    (nextPositions) =>
+      Array.zip(
+        nextPositions,
+        pipe(
+          nextPositions,
+          Array.map((pos) => getXY(pos)(map))
+        )
+      ),
     Array.filter(([_, value]) => Option.isSome(value)),
-    Array.filter(([_, value]) => Option.getOrThrow(value) === currentValue + 1),
+    Array.filter(([_, value]) => Option.getOrThrow(value) === currentValue + 1)
   );
-  if(Array.length(nextValues) > 0) {
-    
-  } else {
-    return Option.none();
-  }
-}
+  return Array.flatMap(nextSteps, ([pos]) => findTrail(pos, map, [...trail, pos]));
+};
 
 export const part1 = (input: string) =>
   Effect.gen(function* () {
     const map = parseInput(grammer, input);
-    const trailHeads = findTrailheads(parsed);
-    yield* Console.log(trailHeads);
-
-    return 0;
+    return pipe(
+      findAllIndexes(map)((s) => s === 0),
+      Array.flatMap((head) => findTrail(head, map, [head])),
+      Array.map((trail) => [Array.headNonEmpty(trail), Array.lastNonEmpty(trail)] as const),
+      Array.dedupeWith(positionTupleEq),
+      Array.length
+    );
   });
 
 export const part2 = (input: string) =>
   Effect.gen(function* () {
-    yield* Effect.fail("Not implemented");
+    const map = parseInput(grammer, input);
+    return pipe(
+      findAllIndexes(map)((s) => s === 0),
+      Array.flatMap((head) => findTrail(head, map, [head])),
+      Array.map((trail) => [Array.headNonEmpty(trail), Array.lastNonEmpty(trail)] as const),
+      Array.length
+    );
   });

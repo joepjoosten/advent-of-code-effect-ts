@@ -1032,6 +1032,7 @@ snapshots:
 
   '@effect/parser@file:../effect-ts-parser/dist(effect@3.11.2)':
     dependencies:
+      '@effect/parser': link:../effect-ts-parser
       effect: 3.11.2
 
   '@effect/platform-node-shared@0.20.3(@effect/platform@0.70.3(effect@3.11.2))(effect@3.11.2)':
