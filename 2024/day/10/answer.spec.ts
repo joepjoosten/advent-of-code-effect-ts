@@ -11,7 +11,7 @@ describe('year 2024 - day 10 - does the parser work?', () => {
         const fs = yield* FileSystem.FileSystem;
         const snippet = yield* fs.readFileString('./2024/day/10/part-1-snippet-5.txt');
         const parsedAndPrinted = Syntax.printString(grammer, Either.getOrThrow(Syntax.parseString(grammer, snippet)));
-        expect(Either.getOrThrow(parsedAndPrinted)).toEqual(snippet);
+        expect(Either.getOrThrow(parsedAndPrinted) + "\n").toEqual(snippet);
     }).pipe(Effect.provide(NodeContext.layer)));
 });
 
