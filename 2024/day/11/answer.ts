@@ -1,53 +1,60 @@
 import * as Syntax from "@effect/parser/Syntax";
-import { Effect, pipe, Array, Option, Console } from "effect";
+import { Array, Effect, pipe } from "effect";
 import { integer, parseInput, toArray } from "../../../utils/parser";
+import { sumArray } from "../../../utils/utils";
 
 export const grammer = pipe(integer, Syntax.repeatWithSeparator1(Syntax.char(" ")), toArray());
 
+type BlinkNr = number;
 type Stone = number;
-type Stones = Array.NonEmptyArray<Stone>;
+type StonesLength = number;
 
 const sliceNumber = (x: number) => (start: number, end: number) => parseInt(x.toString(10).slice(start, end));
 
-const rule1 = (x: number): Option.Option<Stones> => x === 0 ? Option.some([1]) : Option.none();
-const rule2 = (x: number): Option.Option<Stones> => {
-  const length = x.toString(10).length;
-  return length % 2 === 0 
-    ? Option.some([sliceNumber(x)(0, length / 2), sliceNumber(x)(length / 2, length)]) 
-    : Option.none();
-}
-const rule3 = (x: number): Option.Option<Stones> => Option.some([x * 2024]);
+type BlinkHashMap = Record<Stone, Record<BlinkNr, StonesLength>>;
+const blink = (blinkNr: BlinkNr, dic: BlinkHashMap) => (stone: Stone): StonesLength => {
+  if(blinkNr === 0) {
+    return 1;
+  }
 
-const applyRules = (stones: Stones) => pipe(
-  stones,
-  Array.flatMap((x) => pipe(
-    [rule1, rule2, rule3],
-    Array.map((rule) => rule(x)),
-    Array.findFirst(Option.isSome),
-    Option.flatten,
-    Option.getOrThrow,
-  ))
-)
+  if(dic[stone] && dic[stone][blinkNr]) {
+    return dic[stone][blinkNr];
+  }
+
+  let stonesLength: StonesLength;
+  const oom = stone.toString(10).length;
+  if(stone === 0) {
+    stonesLength = blink(blinkNr - 1, dic)(1);
+  } else if(oom % 2 === 0) {
+    stonesLength = blink(blinkNr - 1, dic)(sliceNumber(stone)(0, oom / 2)) + blink(blinkNr - 1, dic)(sliceNumber(stone)(oom / 2, oom));
+  } else {
+    stonesLength = blink(blinkNr - 1, dic)(stone * 2024);
+  }
+
+  if(dic[stone] === undefined) {
+    dic[stone] = {};
+  }
+  dic[stone][blinkNr] = stonesLength;
+
+  return stonesLength
+}
 
 export const part1 = (input: string) =>
   Effect.gen(function* () {
     let stones = parseInput(grammer, input);
-    let blinks = 25;
-    while (blinks > 0) {
-      stones = applyRules(stones);
-      blinks--;
-    }
-    return Array.length(stones);
+    return pipe(
+      stones,
+      Array.map(blink(25, {})),
+      sumArray
+    )
   });
 
 export const part2 = (input: string) =>
   Effect.gen(function* () {
     let stones = parseInput(grammer, input);
-    let blinks = 75;
-    while (blinks > 0) {
-      stones = applyRules(stones);
-      yield* Console.log(`${75 - blinks + 1}: ${Array.length(stones)}`);
-      blinks--;
-    }
-    return Array.length(stones);
+    return pipe(
+      stones,
+      Array.map(blink(75, {})),
+      sumArray
+    )
   });
