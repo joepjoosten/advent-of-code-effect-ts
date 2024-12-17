@@ -50,6 +50,7 @@ export const zipWithIndex2d = <T>(xys: Array<Array<T>>): Array<readonly [T, read
   )
 }
 
+export const addPositions = (lhs: readonly[number, number]) => (rhs: readonly[number, number]): readonly[number, number] => [lhs[0] + rhs[0], lhs[1] + rhs[1]];
 
 export const floodFill = <T>(xys: Array<Array<T>>) => (
   root: readonly [number, number], 
