@@ -1,4 +1,4 @@
-import { Array, HashMap, Iterable, Option, pipe } from "effect";
+import { Array, HashMap, HashSet, Iterable, Option, pipe } from "effect";
 import { invoke } from "./Function.js";
 import { upsert } from "./HashMap.js";
 
@@ -29,8 +29,49 @@ export const transpose = <T>(xs: Array<Array<T>>): Array<Array<T>> =>
 export const makeBy2d = <T>(width: number, height: number, f: ([x, y]: readonly [number, number]) => T): Array.NonEmptyArray<Array.NonEmptyArray<T>> =>
   Array.makeBy(height, (i) => Array.makeBy(width, (j) => f([i, j])));
 
-export const height = <T>(xs: Array<Array<T>>) => xs.length;
-export const width = <T>(xs: Array<Array<T>>) => xs[0].length;
+export const zipWithIndex = <T>(xs: Array<T>): Array<readonly [T, number]> => pipe(
+  xs,
+  Array.map((x, i) => [x, i] as const)
+)
+
+export const zip2d = <T, U>(lhs: Array<Array<T>>, rhs: Array<Array<U>>): Array<Array<readonly [T, U]>> => {
+  return makeBy2d(width(lhs), height(lhs), ([x, y]) => [lhs[x][y], rhs[x][y]] as const);
+}
+
+export const zipWithIndex2d = <T>(xys: Array<Array<T>>): Array<readonly [T, readonly [number, number]]> => {
+  return pipe(
+    xys,
+    zipWithIndex,
+    Array.flatMap(([xs, x]) => pipe(
+      xs,
+      zipWithIndex,
+      Array.map(([v, y]) => [v, [x, y]] as const)
+    ))
+  )
+}
+
+
+export const floodFill = <T>(xys: Array<Array<T>>) => (
+  root: readonly [number, number], 
+  next: (pos: readonly [number, number], value: T) => Iterable<readonly [number, number]>
+): Iterable<readonly [number, number]> => {
+  let visited = HashSet.empty<string>();
+  const fill = [root];
+  const queue = [root];
+  while (queue.length) {
+    const pos = queue.shift()!;
+    if (!HashSet.has(visited, pos.toString())) {
+      visited = HashSet.add(visited, pos.toString());
+      const found = next(pos, Option.getOrThrow(getXY(pos)(xys)));
+      queue.push(...found);
+      fill.push(...found);
+    }
+  }
+  return fill;
+}
+
+export const height = <T>(xys: Array<Array<T>>) => xys.length;
+export const width = <T>(xys: Array<Array<T>>) => xys[0].length;
 
 export const getHorizontals = <T>(xs: Array<Array<T>>) => xs;
 export const getVerticals = <T>(xs: Array<Array<T>>) => xs[0].map((_, i) => xs.map((ys) => ys[i]));
