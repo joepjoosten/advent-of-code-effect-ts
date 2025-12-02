@@ -6,24 +6,26 @@
     "aoc": "./index.ts"
   },
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "aoc": "bun run ./index.ts"
   },
   "dependencies": {
-    "effect": "^3.11.2",
-    "@effect/platform": "^0.70.0",
-    "@effect/platform-node": "^0.65.0",
-    "@effect/printer-ansi": "^0.39.2",
-    "@effect/cli": "^0.49.0",
+    "effect": "^3.19.8",
+    "@effect/platform": "^0.93.6",
+    "@effect/platform-node": "^0.103.0",
+    "@effect/typeclass": "^0.38.0",
+    "@effect/printer-ansi": "^0.47.0",
+    "@effect/cli": "^0.72.1",
     "@effect/parser": "file:../effect-ts-parser/dist",
-    "cheerio": "^1.0.0",
-    "globby": "^14.0.2",
-    "tsx": "^4.19.2",
+    "cheerio": "^1.1.2",
+    "globby": "^16.0.0",
+    "tsx": "^4.21.0",
     "aoc2024": "file:."
   },
   "devDependencies": {
-    "@effect/vitest": "^0.14.1",
-    "@types/node": "^20.0.0",
-    "vite": "^5.4.0",
-    "vitest": "^2.1.4"
+    "@effect/vitest": "^0.27.0",
+    "@types/node": "^24.10.1",
+    "vite": "^7.2.6",
+    "vitest": "^3.2.0"
   }
 }
