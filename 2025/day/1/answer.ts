@@ -5,7 +5,11 @@ import { euclideanDiv, euclideanMod } from "../../../utils/utils";
 
 const newline = Syntax.char("\n");
 
-const rotationsRule = pipe(Syntax.letter, Syntax.zip(integer), Syntax.transform(([l, x]) => l === 'L' ? -x : x, (x) => [x < 0 ? 'L' : 'R', Math.abs(x)] as const)); 
+const rotationsRule = pipe(
+  Syntax.letter, 
+  Syntax.zip(integer), 
+  Syntax.transform(([l, x]) => l === 'L' ? -x : x, (x) => [x < 0 ? 'L' : 'R', Math.abs(x)] as const)
+); 
 export const grammer = pipe(rotationsRule, Syntax.repeatWithSeparator1(newline), toArray());
 
 const range = 100; // 0 - 99
