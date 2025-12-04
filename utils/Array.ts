@@ -50,7 +50,7 @@ export const zipWithIndex2d = <T>(xys: Array<Array<T>>): Array<readonly [T, read
   )
 }
 
-export const addPositions = (lhs: readonly[number, number]) => (rhs: readonly[number, number]): readonly[number, number] => [lhs[0] + rhs[0], lhs[1] + rhs[1]];
+export const addPositions = (lhs: Coords) => (rhs: Coords): Coords => [lhs[0] + rhs[0], lhs[1] + rhs[1]];
 
 export const floodFill = <T>(xys: Array<Array<T>>) => (
   root: readonly [number, number], 
@@ -100,15 +100,26 @@ export const rightToLeftDiagonals = <T>(xys: Array<Array<T>>): Array<Array<T>> =
   leftToRightDiagonals
 )
 
+export type Coords = readonly[number, number];
+
 export const histogram = <T>(xs: Iterable<T>): HashMap.HashMap<T, number> => pipe(
   xs,
   Iterable.reduce(HashMap.empty<T, number>(), (acc, x) => pipe(upsert(acc)(x, Option.match({ onNone: () => 1, onSome: (v) => v + 1 }))))
 )
 
-export const getXY = ([x, y]: readonly[number, number]) => <T>(xys: Array<Array<T>>): Option.Option<T> =>
+export const getXY = ([x, y]: Coords) => <T>(xys: Array<Array<T>>): Option.Option<T> =>
   pipe(xys, Array.get(x), Option.flatMap(Array.get(y)));
 
-export const setXY = <T>([x, y]: readonly[number, number], value: T) => (xys: Array<Array<T>>): Array<Array<T>> =>
+export const top = ([x, y]: Coords) => getXY([x, y - 1]);
+export const bottom = ([x, y]: Coords) => getXY([x, y + 1]);
+export const left = ([x, y]: Coords) => getXY([x - 1, y]);
+export const right = ([x, y]: Coords) => getXY([x + 1, y]);
+export const topLeft = ([x, y]: Coords) => getXY([x - 1, y - 1]);
+export const topRight = ([x, y]: Coords) => getXY([x + 1, y - 1]);
+export const bottomLeft = ([x, y]: Coords) => getXY([x - 1, y + 1]);
+export const bottomRight = ([x, y]: Coords) => getXY([x + 1, y + 1]);
+
+export const setXY = <T>([x, y]: Coords, value: T) => (xys: Array<Array<T>>): Array<Array<T>> =>
   Array.modify(xys, x, (ys) => Array.modify(ys, y, () => value));
 
 export const findAllIndexes = <T>(xys: Array<Array<T>>) => (predicate: (x: T) => boolean): Array<readonly [number, number]> => {
